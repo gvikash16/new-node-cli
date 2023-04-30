@@ -1,11 +1,11 @@
 {
-  "name": "new-node-cli",
+  "name": "auth-e2e",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "type": "module",
   "bin": {
-    "dev-cli": "./index.js"
+    "auth-e2e": "./index.js"
   },
   "keywords": [],
   "author": "",

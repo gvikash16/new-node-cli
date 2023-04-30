@@ -14,7 +14,7 @@ import {
 
 const userHomeDir = homedir();
 const { preload } = cli.flags;
-console.log('cli', cli.input, cli.flags);
+// console.log('cli', cli.input, cli.flags);
 init();
 function init() {
     if(!cli.flags.name) {
