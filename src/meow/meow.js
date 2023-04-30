@@ -6,6 +6,7 @@ const { yellow } = chalk;
 const meowHelp = `
   ${yellow(`--preload`)}     To preload the already defined set up
   ${yellow(`--no-preload`)}  It will ask you to setup manually
+  ${yellow(`--name`)}        Provide project name to the plugin
 `;
 
 const meowFlags = {
@@ -20,7 +21,13 @@ const meowFlags = {
       type: 'boolean',
       alias: 'b',
       default: false
+    },
+    name: {
+      type: 'string',
+      alias: 'n',
+      isRequired: true
     }
+  
   }
 }
 
