@@ -1,12 +1,26 @@
 import chalk from 'chalk';
 import meow from 'meow';
 
-const { yellow } = chalk;
+const { green, yellow, cyan } = chalk;
 
 const meowHelp = `
-  ${yellow(`--preload`)}     To preload the already defined set up
-  ${yellow(`--no-preload`)}  It will ask you to setup manually
-  ${yellow(`--name`)}        Provide project name to the plugin
+  Usage
+	  ${green(`auth-e2e`)} ${cyan(`<command>`)} ${yellow(`[--option]`)}
+
+	Commands
+	  ${cyan(`setup`)}            Create a config file in root folder
+	  ${cyan(`addPlugin`)}        Add entry to the mounted plugin
+	  ${cyan(`removePlugin`)}     Remove entry from the mounted plugin
+
+	Options
+    ${yellow(`-p`)}, ${yellow(`--preload`)}      To preload the already defined set up
+    ${yellow(`-np`)}, ${yellow(`--no-preload`)}  It will ask you to setup manually
+    ${yellow(`-n`)}, ${yellow(`--name`)}         Provide project name to the plugin
+
+	Examples
+	  ${green(`auth-e2e`)} ${cyan(`setup`)} ${yellow(`--name=`)}${yellow(`"project-name"`)}
+	  ${green(`auth-e2e`)} ${cyan(`addPlugin`)} ${yellow(`--name=`)}${yellow(`"plugin-name"`)}
+	  ${green(`auth-e2e`)} ${cyan(`removePlugin`)} ${yellow(`--name=`)}${yellow(`"plugin-name"`)}
 `;
 
 const meowFlags = {
@@ -32,14 +46,3 @@ const meowFlags = {
 }
 
 export default meow(meowHelp, meowFlags);
-
-
-
-// const flags = process.argv.slice(2)[0];
-// const input = process.argv.slice(2)[1];
-// if(flags || input) {
-//   console.log('flags', flags);
-//   console.log('input', input);
-// } else{
-//   alert({type: 'error', msg: 'You have not entered any flag or input'});
-// }
