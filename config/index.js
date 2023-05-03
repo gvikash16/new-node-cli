@@ -1,5 +1,7 @@
 const config = {
     PROJECT_NAME: 'new-cli',
+    PROJECT_PATH: process.cwd(),
+    PROJECT_CONFIG_FILE_NAME: 'config.json',
     DEFAULT_FOLDER_NAME: 'digital_authoring',
     APP1:'APP1',
     DEFAULT_JSON_FILE: 'user.json',

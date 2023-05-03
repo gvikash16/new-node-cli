@@ -12,18 +12,18 @@ const defaultOptions = {
   msg: 'You have missed some options'
 }
 const alert = (options) => {
-  const opt = { ...defaultOptions, ...options };
-  if (opt.type === 'error') {
-    log(`${sym.error} ${chalk.red.bold.underline(`${opt.type.toUpperCase()}`)} ${opt.msg}\n`);
+  const {type, msg} = { ...defaultOptions, ...options };
+  if (type === 'error') {
+    log(`${sym.error} ${chalk.red.bold.underline(`${type.toUpperCase()}`)} ${msg}\n`);
   }
-  if (opt.type === 'success') {
-    log(`${sym.success} ${chalk.green.italic.underline(`${opt.type.toUpperCase()}`)} ${opt.msg}\n`);
+  if (type === 'success') {
+    log(`${sym.success} ${chalk.green.italic.underline(`${type.toUpperCase()}`)} ${msg}\n`);
   }
-  if (opt.type === 'warning') {
-    log(`${sym.warning} ${chalk.yellow.italic.underline(`${opt.type.toUpperCase()}`)} ${opt.msg}\n`);
+  if (type === 'warning') {
+    log(`${sym.warning} ${chalk.yellow.italic.underline(`${type.toUpperCase()}`)} ${msg}\n`);
   }
-  if (opt.type === 'info') {
-    log(`${sym.info} ${chalk.bgBlue.italic.underline(`${opt.type.toUpperCase()}`)} ${opt.msg}\n`);
+  if (type === 'info') {
+    log(`${sym.info} ${chalk.bgBlue.italic.underline(`${type.toUpperCase()}`)} ${msg}\n`);
   }
 }
 export default alert;

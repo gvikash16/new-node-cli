@@ -4,6 +4,7 @@ import config from './config/index.js';
 import alert from './src/utils/alert.js';
 // const { exec } = require('child_process');
 import cli from './src/meow/meow.js';
+import createConfig from './src/utils/helper.js';
 import { homedir } from 'os';
 import {
     setUp,
@@ -14,6 +15,7 @@ import {
 
 const userHomeDir = homedir();
 const { preload } = cli.flags;
+const CONFIG_CREATION_PATH = `${config.PROJECT_PATH}/${config.PROJECT_CONFIG_FILE_NAME}`
 // console.log('cli', cli.input, cli.flags);
 init();
 function init() {
@@ -23,23 +25,24 @@ function init() {
         process.exit();
     }
     if(cli.input.indexOf('setup') !=-1) {
-        setUp();
+        setUp(cli, CONFIG_CREATION_PATH);
     }
     if(cli.input.indexOf('addPlugin') !=-1) {
-        addPlugin();
+        addPlugin(cli, CONFIG_CREATION_PATH);
     }
     if(cli.input.indexOf('removePlugin') !=-1) {
-        removePlugin();
+        removePlugin(cli, CONFIG_CREATION_PATH);
     }
     if(cli.input.indexOf('logPlugin') !=-1) {
-        logPlugin();
+        logPlugin(cli, CONFIG_CREATION_PATH);
     }
-    console.log(`init`);
+    // createConfig(cli.flags.name)
+    // alert({ type: 'error', msg: cli.flags.name });
 }
 
 function setEnvVars() {
     const pathToScript = new URL('.', import.meta.url).pathname;
-    const home = process.env.HOME || '/c/Users/gvika';
+    const home = process.env.HOME || homedir();
     process.env.CURRENT_DIR = pathToScript;
     process.env.CLIENT_BUILD_DIR = `${home}/${config.PROJECT_NAME}`;
     process.env.PROJECT_NAME = config.PROJECT_NAME;
@@ -56,4 +59,4 @@ function executeBashScript(path) {
     child.on('close', console.log);
     child.on('error', console.error);
 }
-executeBashScript('./run.sh');
+// executeBashScript('./run.sh');

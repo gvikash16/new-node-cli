@@ -1,0 +1,11 @@
+{
+    "project-name": "hello",
+    "mounted-plugin":[
+        {
+            "name": "plugin-name",
+            "path": "path/of/the/plugin/to/be/injected"
+        }
+    ],
+    "initialize-project": "string",
+    "last-inserted-plugin": "string"
+}
