@@ -9,8 +9,7 @@ import { homedir } from 'os';
 import {
     setUp,
     addPlugin,
-    removePlugin,
-    logPlugin
+    removePlugin
 } from './src/index.js';
 
 const userHomeDir = homedir();
