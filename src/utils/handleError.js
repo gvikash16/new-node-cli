@@ -1,18 +1,15 @@
-/**
- * Node Cli Handle Error.
- */
 import { red, yellow } from 'chalk';
 import sym from 'log-symbols';
 
 /**
+ * Node Cli Handle Error.
  * @param {String} heading
  * @param {Error} err
  * @param {Boolean} displayError
  * @param {Boolean} exit
  */
-module.exports = (heading = `ERROR: `, err, displayError = true, exit = true) => {
+export default function handleError(heading = `ERROR: `, err, displayError = true, exit = true) {
 	if (err) {
-		console.log();
 		if (displayError) {
 			console.log(`${sym.error} ${red(heading)}`);
 			console.log(`${sym.error} ${red(`ERROR →`)} ${err.name}`);
@@ -27,4 +24,4 @@ module.exports = (heading = `ERROR: `, err, displayError = true, exit = true) =>
 			return false;
 		}
 	}
-};
+}

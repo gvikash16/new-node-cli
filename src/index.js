@@ -1,23 +1,25 @@
 import { writeToFile, readFile, checkFileExist } from './fs/file.js';
 import alert from './utils/alert.js';
+import config from './../config/index.js';
+import {basename} from 'path';
 
-const setUp = async (cli, configPath) => {
-    const [checkError, exists] = await checkFileExist(configPath);
-    console.log(`checkError`, checkError);
-    if (checkError) {
-      console.log('An error occurred while checking if file exists:', checkError);
-    } else if (exists) {
-      alert({ type: 'error', msg: 'Setup is already done!' });
-      process.exit(0);
-    } else {
-      const myConfig = { 
-          "projectName": cli.flags.name,
-          "initializeDirectory": process.cwd().split('\\').at(-1)
-      };
-      writeToFile(configPath, myConfig);
-    }
-    // if (checkFileExist(configPath)) {
-    // }
+function getFolderInfo() {
+    const folderPath = process.cwd();
+    const folderName = basename(folderPath);
+    return { folderName, folderPath };
+}
+
+const setup = (option) => {
+    const {vip_path} = config;
+    console.log('vip_path:', vip_path);
+    const {projectName} = option;
+    const {folderName, folderPath} = getFolderInfo();
+    // vip_path check exists
+
+    // let myConfig = { "project-name": cli.flags.name };
+    // myConfig["initialize-directory"] = process.cwd().split('\\').at(-1);
+    // writeToFile(configPath, myConfig);
+    // console.log("🚀 ~ file: index.js:4 ~ setUp ~ setUp:");
 }
 
 const addPlugin = (cli, configPath) => {
@@ -45,7 +47,7 @@ const removePlugin = (cli, configPath) => {
 }
 
 export {
-    setUp,
+    setup,
     addPlugin,
     removePlugin,
 }

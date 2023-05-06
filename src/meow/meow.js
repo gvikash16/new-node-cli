@@ -15,16 +15,17 @@ const meowHelp = `
 	Options
     ${yellow(`-p`)}, ${yellow(`--preload`)}      To preload the already defined set up
     ${yellow(`-np`)}, ${yellow(`--no-preload`)}  It will ask you to setup manually
-    ${yellow(`-n`)}, ${yellow(`--name`)}         Provide project name to the plugin
+    ${yellow(`-n`)}, ${yellow(`--project-name`)}  Provide project project-name to the plugin
 
 	Examples
-	  ${green(`auth-e2e`)} ${cyan(`setup`)} ${yellow(`--name=`)}${yellow(`"project-name"`)}
-	  ${green(`auth-e2e`)} ${cyan(`addPlugin`)} ${yellow(`--name=`)}${yellow(`"plugin-name"`)}
-	  ${green(`auth-e2e`)} ${cyan(`removePlugin`)} ${yellow(`--name=`)}${yellow(`"plugin-name"`)}
+	  ${green(`auth-e2e`)} ${cyan(`setup`)} ${yellow(`--project-name=`)}${yellow(`"project-name"`)}
+	  ${green(`auth-e2e`)} ${cyan(`addPlugin`)} ${yellow(`--project-name=`)}${yellow(`"plugin-name"`)}
+	  ${green(`auth-e2e`)} ${cyan(`removePlugin`)} ${yellow(`--project-name=`)}${yellow(`"plugin-name"`)}
 `;
 
 const meowFlags = {
   importMeta: import.meta,
+  default: { projectName: 'en' },
   flags: {
     preload: {
       type: 'boolean',
@@ -36,10 +37,10 @@ const meowFlags = {
       alias: 'b',
       default: false
     },
-    name: {
+    projectName: {
       type: 'string',
       alias: 'n',
-      isRequired: true
+      default: 'rainbow',
     }
   
   }

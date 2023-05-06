@@ -1,14 +1,14 @@
 const config = {
-    PROJECT_NAME: 'new-cli',
-    PROJECT_PATH: process.cwd(),
-    PROJECT_CONFIG_FILE_NAME: 'config.json',
-    DEFAULT_FOLDER_NAME: 'digital_authoring',
-    APP1:'APP1',
-    DEFAULT_JSON_FILE: 'user.json',
-    DELETE_FILE: 'user.json',
-    FILE_NAME_WHERE_STRING_TO_BE_REPLACED:{
+    projectName: 'new-cli',
+    projectPath: process.cwd(),
+    projectConfigFileName: 'config.json',
+    defaultFolderName: 'digital_authoring',
+    app1:'APP1',
+    defaultJsonFile: 'user.json',
+    deleteFile: 'user.json',
+    fileNameWhereStringToBeReplaced:{
         name: 'string.txt',
-        string_to_be_replaced: {
+        stringToBeReplaced: {
             "Helo": "Hello",
             "worLd": "world",
             "glads": "glad",
@@ -16,34 +16,34 @@ const config = {
             "Im": "I'm"
         }
     },
-    DEPENDENCIES: {
-        "filePath": "user.json",
-        "keyToBeUpdated": "dependencies",
-        "toBeAdded": [
+    dependencies: {
+        filePath: "user.json",
+        keyToBeUpdated: "dependencies",
+        toBeAdded: [
             {
-                "package-name" : "barfi",
-                "version-name": "2.3.1"
+                packageName : "barfi",
+                versionName: "2.3.1"
             },
             {
-                "package-name" : "vikash",
-                "version-name": "1.3.1"
+                packageName : "vikash",
+                versionName: "1.3.1"
             }
         ]
     },
-    PACKAGE: {
-        "filePath": "package.json",
-        "keyToBeUpdated": "files",
-        "itemsToBeAdded": [
+    package: {
+        filePath: "package.json",
+        keyToBeUpdated: "files",
+        itemsToBeAdded: [
             "item1",
             "item2",
             "item5"
         ],
-        "itemsToBeRemoved": [
+        itemsToBeRemoved: [
             "item1",
             "item2",
             "item3"
         ]
-    }
+    },
+    vip_path:'/.local/share/vip/dev-environment'
 }
-// /.local/share/vip/dev-environment/rahul
 export default config
