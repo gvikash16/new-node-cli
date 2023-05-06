@@ -1,11 +1,11 @@
 {
-  "name": "auth-e2e",
+  "name": "vcli",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "type": "module",
   "bin": {
-    "auth-e2e": "./index.js"
+    "vcli": "./index.js"
   },
   "keywords": [],
   "author": "",
