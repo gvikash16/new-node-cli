@@ -19,6 +19,7 @@ const CONFIG_CREATION_PATH = `${config.PROJECT_PATH}/${config.PROJECT_CONFIG_FIL
 // console.log('cli', cli.input, cli.flags);
 init();
 function init() {
+    console.log('sss');
     if(!cli.flags.name) {
         alert({ type: 'error', msg: 'Name flag and its value is required' });
         process.exitCode = 1;
