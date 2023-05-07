@@ -44,6 +44,12 @@ const config = {
             "item3"
         ]
     },
-    vip_path:'/.local/share/vip/dev-environment'
+    vip_path:'.local/share/vip/dev-environment',
+    branch_name:'production',
+    remote_git_url:'Automattic/vip-go-skeleton',
+    auth_env_config_file_name:'auth-env.json',
+    folder_name:'vcli',
+    defaultProjectName:'next-wp',
+    media_redirect_domain:'xyz.com'
 }
 export default config

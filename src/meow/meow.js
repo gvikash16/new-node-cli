@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import meow from 'meow';
+import config from './../../config/index.js';
 
 const { green, yellow, cyan } = chalk;
 
@@ -39,8 +40,8 @@ const meowFlags = {
     },
     projectName: {
       type: 'string',
-      alias: 'n',
-      default: 'rainbow',
+      alias: 'p',
+      default: config.defaultProjectName,
     }
   
   }

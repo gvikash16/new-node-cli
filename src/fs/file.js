@@ -1,5 +1,8 @@
 import fs from 'fs';
 import alert from '../utils/alert.js';
+import { execa } from 'execa';
+
+
 
 const readFile = async (filePath) => {
   try {
@@ -11,34 +14,34 @@ const readFile = async (filePath) => {
 }
 
 const writeToFile = async (filePath, data) => {
-try {
-  await fs.promises.writeToFile(filePath, data);
-  return [null];
-} catch (error) {
-  return [error];
-}
+  try {
+    await fs.promises.writeToFile(filePath, data);
+    return [null];
+  } catch (error) {
+    return [error];
+  }
 }
 
 const checkFileExist = async (filePath) => {
   try {
     await fs.promises.access(filePath);
     return [null, true];
-} catch (error) {
-  if (error.code === 'ENOENT') {
-    return [null, false];
-  } else {
-    return [error, null];
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return [null, false];
+    } else {
+      return [error, null];
+    }
   }
-}
 }
 
 const deleteFile = async (filePath) => {
-try {
-  await fs.promises.unlink(filePath);
-  return [null];
-} catch (error) {
-  return [error];
-}
+  try {
+    await fs.promises.unlink(filePath);
+    return [null];
+  } catch (error) {
+    return [error];
+  }
 }
 
 // const readFile = (filePath) => {
@@ -70,15 +73,31 @@ try {
 // }
 
 const checkFilePathExist = (filePath) => {
-  
+
 }
 
 const copyFile = (filePath) => {
 
 }
+/**
+ * Creates a new folder with the specified name.
+ * @param {string} folderName - The name of the folder to create.
+ * @returns {Promise<void>} A Promise that resolves when the folder has been created.
+ */
+async function createFolder(folderPath) {
+  try {
+    if (!fs.existsSync(folderPath)) {
+      await execa('mkdir', ['-p', folderPath]);
+    }
+  } catch (error) {
+    console.error(`An error occurred: ${error.message}`);
+  }
+}
+
 export {
   readFile,
   deleteFile,
   writeToFile,
-  checkFileExist
+  checkFileExist,
+  createFolder
 };
