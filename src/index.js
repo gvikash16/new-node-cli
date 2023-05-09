@@ -1,14 +1,30 @@
 import { writeToFile, readFile, checkFileExist, createFolder } from './fs/file.js';
 import alert from './utils/alert.js';
+import handleError from './utils/handleError.js';
 import config from './../config/index.js';
 import { basename } from 'path';
 import { homedir } from 'os';
-import { execa } from 'execa';
+import { execa } from 'execa'
+import yaml from 'js-yaml';
+import fs from 'fs';
 
-function getFolderInfo() {
-    const folderPath = process.cwd();
-    const folderName = basename(folderPath);
-    return { folderName, folderPath };
+/**
+ * Returns an object containing information about the application.
+ * @param {Object} options - The options object.
+ * @param {string} options.projectName - The name of the project.
+ * @returns {Object} An object containing information about the application.
+ */
+function getApplicationInformation(options) {
+    const { vipDirectory, authConfigFileName, appDirectory, docker_file_name } = config;
+    const { projectName } = options;
+    const currentDirectoryPath = process.cwd();
+    const currentDirectoryName = basename(currentDirectoryPath);
+    const applicationCodePath = `${homedir()}/${appDirectory}/${projectName}`;
+    const vipDirectoryPath = `${homedir()}/${vipDirectory}/${projectName}/`
+    const vipConfigPath = `${homedir()}/${vipDirectory}/${projectName}/${authConfigFileName}`
+    const logsPath = `${homedir()}/${vipDirectory}/${projectName}/log/debug.log`;
+    const vipDockerFile = `${homedir()}/${vipDirectory}/${projectName}/${docker_file_name}`;
+    return { currentDirectoryName, currentDirectoryPath, applicationCodePath, vipDirectoryPath, vipConfigPath, logsPath, vipDockerFile };
 }
 
 const execProcess = async (process, args) => {
@@ -18,57 +34,178 @@ const execProcess = async (process, args) => {
         console.error(`Error: ${error}`);
     }
 }
-const setup = async (option) => {
-    const { vip_path, branch_name, remote_git_url, auth_env_config_file_name, folder_name, media_redirect_domain } = config;
-    //TODO need to add method where it can do some string clan up
-    const { projectName } = option;
-    const clonedProjectPath = `${homedir()}/${folder_name}/${projectName}`;
-    const { folderName, folderPath } = getFolderInfo();
-    const configPathForProject = `${homedir()}/${vip_path}/${projectName}/${auth_env_config_file_name}`
-    const [error, isFileExist] = await checkFileExist(configPathForProject);
-    //TODO: add error handelander
-    if (!isFileExist) {
-        // const projectPath = `${homedir()}/${vip_path}/${projectName}`;
-        // await createFolder(projectPath);
-        await createFolder(clonedProjectPath);
-        const github_token = process.env.GITHUB_TOKEN;
-        const git_url = `https://${github_token}@github.com/${remote_git_url} -b ${branch_name} ${clonedProjectPath} --depth 1`
-        await execProcess('git', `clone ${git_url}`)
-        await execProcess('vip', `dev-env create  --elasticsearch=false --mailhog=false --media-redirect-domain=${media_redirect_domain} --mu-plugins=image --multisite=true --php=8.0 --phpmyadmin=false --slug=${projectName} --title=${projectName} --wordpress=6.1.1 --xdebug=false --app-code=${clonedProjectPath}`)
-        await execProcess('vip', `dev-env start --slug ${projectName}`)
-        //TODO:
-         let myConfig = { "project_name": projectName, "initialize-directory": folderPath};
-        await writeToFile(configPathForProject, myConfig);
-        console.log('done')
+/**
+ * Sets up a development environment by cloning a git repository and creating a VIP dev environment.
+ * @param {Object} options - The options object containing information about the project and file paths.
+ * 
+ * This function performs the following steps:
+ * 1. Checks if the VIP config file already exists. If it does, an error is thrown.
+ * 2. Creates the app code folder if it does not already exist.
+ * 3. Clones the specified git repository into the app code folder.
+ * 4. Creates a VIP dev environment using the specified options.
+ * 5. Starts the VIP dev environment.
+ * 6. Writes the project name and initialize-directory to the VIP config file.
+ */
+const setup = async (options) => {
+
+    const { branch, repositoryUrl, redirectDomain, php_version, wp_version } = config;
+    const { projectName } = options;
+    const { currentDirectoryPath, applicationCodePath, vipConfigPath } = getApplicationInformation(options);
+    try {
+        const [error, isFileExist] = await checkFileExist(vipConfigPath);
+        error && handleError(`You have already have project with this project name ${projectName}`, error);
+        if (!isFileExist) {
+            await createFolder(applicationCodePath);
+            const github_token = process.env.GITHUB_TOKEN;
+            const git_url = `https://${github_token}@github.com/${repositoryUrl} -b ${branch} ${applicationCodePath} --depth 1`
+            await execProcess('git', `clone ${git_url}`)
+            await execProcess('vip', `dev-env create  --elasticsearch=false --mailhog=false --media-redirect-domain=${redirectDomain} --mu-plugins=image --multisite=true --php=${php_version} --phpmyadmin=false --slug=${projectName} --title=${projectName} --wordpress=${wp_version} --xdebug=false --app-code=${applicationCodePath}`)
+            await execProcess('vip', `dev-env start --slug ${projectName}`)
+            const myConfig = JSON.stringify({ "project_name": projectName, "initialize-directory": currentDirectoryPath }, null, 2);
+            await writeToFile(vipConfigPath, myConfig);
+            alert({ type: 'success', msg: `${projectName} setup done successfully` });
+        }
+    }
+    catch (error) {
+        alert({ type: 'error', msg: `${error.message}` });
+        // console.error(`An error occurred while setting up the development environment: ${error.message}`);
     }
 }
 
-const addPlugin = (cli, configPath) => {
-    let config;
-    try {
-        config = readFile(configPath);
-    } catch (e) {
-        alert({ type: 'error', msg: 'File not found. Try setup first.' });
-        process.exit(0);
+
+
+/**
+ * Removes an object from an array based on the value of a specified property.
+ * @param {Array} array - The array to remove the object from.
+ * @param {string} propertyName - The name of the property to match.
+ * @param {any} propertyValue - The value of the property to match.
+ * @returns {Array} The updated array after removing the object.
+ * @throws {TypeError} If `array` is not an array or `propertyName` is not a string.
+ */
+const removeObjectByProperty = (array, propertyName, propertyValue) => {
+    if (!Array.isArray(array)) {
+        throw new TypeError('The "array" parameter must be an array.');
     }
-    config['mountedPlugin'] = [...(config['mountedPlugin'] || []).filter(({ name }) => name !== cli.flags.name), { name: cli.flags.name, path: process.cwd() }];
-    writeToFile(configPath, config);
+    if (typeof propertyName !== 'string') {
+        throw new TypeError('The "propertyName" parameter must be a string.');
+    }
+    const index = array.findIndex(obj => obj[propertyName] === propertyValue);
+    if (index !== -1) {
+        array.splice(index, 1);
+    }
+    return array;
+}
+/**
+ * Updates a list in a JSON file by adding or removing an item or clearing the list.
+ * @param {Object} options - The options object containing information about the item and file paths.
+ * @param {string} action - The action to perform: 'add', 'remove', or 'clear'.
+ * @param {string} [itemNameProperty='name'] - The name of the property to use for the item name.
+ * @param {string} [itemPathProperty='path'] - The name of the property to use for the item path.
+ * @throws {TypeError} If `options` is not an object or `action` is not a string.
+ */
+const updateList = async (options, action, itemNameProperty = 'name', itemPathProperty = 'path') => {
+    if (typeof options !== 'object' || options === null) {
+        throw new TypeError('The "options" parameter must be an object.');
+    }
+    if (typeof action !== 'string') {
+        throw new TypeError('The "action" parameter must be a string.');
+    }
+    const { currentDirectoryName, currentDirectoryPath, vipConfigPath, vipDockerFile } = getApplicationInformation(options);
+    const [error, data] = await readFile(vipConfigPath);
+    // const [errorInDocker, yamlData] = await readFile(vipDockerFile);
+    const yamlData = yaml.load(fs.readFileSync(vipDockerFile, 'utf8'));
+
+    let jsonData = JSON.parse(data);
+    let list = jsonData['mountedPluginList'] || [];
+    const hasItem = list.some(obj => obj[itemNameProperty] === currentDirectoryName);
+    let message = '';
+    switch (action) {
+        case 'add':
+            if (!hasItem) {
+                list.push({ [itemNameProperty]: currentDirectoryName, [itemPathProperty]: currentDirectoryPath });
+                message = 'added current directory';
+            }
+            break;
+        case 'remove':
+            if (hasItem) {
+                list = removeObjectByProperty(list, itemNameProperty, currentDirectoryName);
+                message = 'removed current directory';
+            }
+            break;
+        case 'clear':
+            list = [];
+            message = 'cleared mountedPluginList';
+            break;
+        default:
+            throw new Error(`Invalid action: ${action}`);
+    }
+    console.log('vipDockerFile:', vipDockerFile);
+    jsonData['mountedPluginList'] = list;
+    await writeToFile(vipConfigPath, JSON.stringify(jsonData));
+    const yamlDump = await modifyDockerVolumes(list, yamlData);
+    // await writeToFile(vipDockerFile, yamlDump);
+    fs.writeFileSync(vipDockerFile, yamlDump, 'utf8');
+
+    alert({ type: 'success', msg: `${message}` });
+}
+/**
+ * Adds a plugin to the mounted plugin list in a JSON file.
+ * @param {Object} option - The option object containing information about the plugin and file paths.
+ */
+const addPlugin = async (options) => {
+    updateList(options, 'add');
+}
+/**
+ * Removes a plugin from the mounted plugin list in a JSON file.
+ * @param {Object} option - The option object containing information about the plugin and file paths.
+ */
+const removePlugin = async (options) => {
+    updateList(options, 'remove');
 }
 
-const removePlugin = (cli, configPath) => {
-    let myConfig;
-    try {
-        myConfig = readFile(configPath);
-    } catch (e) {
-        alert({ type: 'error', msg: 'File not found. Try setup first.' });
-        process.exit(0);
-    }
-    myConfig['mountedPlugin'] = [...(myConfig['mountedPlugin'] || []).filter(({ name }) => name !== cli.flags.name)];
-    writeToFile(configPath, myConfig);
+
+/**
+ * Removes a plugin from the mounted plugin list in a JSON file.
+ * @param {Object} option - The option object containing information about the plugin and file paths.
+ */
+const removeAllPlugin = async (options) => {
+    updateList(options, 'clear');
+}
+
+/**
+ * Displays the contents of a log file in real-time using the `tail` command.
+ * @param {Object} options - The options object containing information about the log file path.
+ */
+const logs = async (options) => {
+    const { logsPath } = getApplicationInformation(options);
+    updatePluginList(options)
+    // await execProcess('tail', `-f ${logsPath}`)
+}
+
+const updatePluginList = (options) => {
+    const { vipDockerFile } = getApplicationInformation(options);
+    console.log('vipDockerFile:', vipDockerFile);
+}
+
+/**
+ * Modifies the volumes in a Docker YAML file based on data from a JSON file.
+ * @param {string} jsonFile - The path to the JSON file.
+ * @param {string} yamlFile - The path to the YAML file.
+ */
+function modifyDockerVolumes(mountedPluginList, yamlData) {
+    // Get mountedPluginList paths from JSON data
+    const mountedPluginListPaths = mountedPluginList.map(({ path, name }) => `${path}:/wp/wp-content/plugins/${name}`);
+
+    // Add mountedPluginList paths to volumes in YAML data
+    yamlData.services.php.services.volumes.push(...mountedPluginListPaths);
+    yamlData.services.nginx.services.volumes.push(...mountedPluginListPaths);
+    return yaml.dump(yamlData);
 }
 
 export {
     setup,
     addPlugin,
     removePlugin,
+    removeAllPlugin,
+    logs
 }

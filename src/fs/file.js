@@ -15,7 +15,7 @@ const readFile = async (filePath) => {
 
 const writeToFile = async (filePath, data) => {
   try {
-    await fs.promises.writeToFile(filePath, data);
+    await fs.promises.writeFile(filePath, data);
     return [null];
   } catch (error) {
     return [error];

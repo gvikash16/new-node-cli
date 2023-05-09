@@ -3,13 +3,15 @@ import { spawn, exec } from 'child_process';
 import config from './config/index.js';
 import alert from './src/utils/alert.js';
 // const { exec } = require('child_process');
-import cli from './src/meow/meow.js';
+import cli from './src/utils/cli.js';
 import createConfig from './src/utils/helper.js';
 import { homedir } from 'os';
 import {
     setup,
     addPlugin,
-    removePlugin
+    removePlugin,
+    removeAllPlugin,
+    logs
 } from './src/index.js';
 
 const userHomeDir = homedir();
@@ -98,23 +100,37 @@ function validateOptions(options) {
  * @param {string[]} args - The arguments for the command
  */
 async function handleCommand(command, options) {
-
     validateOptions(options);
+    // add check for docker is ruining and node version 
     switch (command) {
-      case 'setup':
-      case 'init':
-        setup(options);
-        break;
-      case 'addPlugin':
-      case 'add':
-        addPlugin(...args);
-        break;
-      case 'removePlugin':
-      case 'rm':
-        removePlugin(...args);
-        break;
-      default:
-        console.log(`Unknown command: ${command}`);
+        case 'setup':
+        case 'init':
+            setup(options);
+            break;
+        case 'addPlugin':
+        case 'add':
+            addPlugin(options);
+            break;
+        case 'removePlugin':
+        case 'rm':
+            removePlugin(options);
+            break;
+        case 'removeAllPlugin':
+        case 'clear':
+            removeAllPlugin(options);
+            break;
+        case 'logs':
+            logs(options);
+            break;
+        // case 'resetDB':
+        //     reset(options);
+        //     break;
+        // case 'mountedPluginList':
+        //     reset(options);
+        //     break;
+    
+        default:
+            console.log(`Unknown command: ${command}`);
     }
 }
 
