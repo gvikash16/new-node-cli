@@ -1,6 +1,7 @@
-import { red, yellow } from 'chalk';
+import chalk from 'chalk';
 import sym from 'log-symbols';
 
+const { red, yellow } = chalk;
 /**
  * Node Cli Handle Error.
  * @param {String} heading

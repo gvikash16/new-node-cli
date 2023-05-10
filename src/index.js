@@ -47,23 +47,25 @@ const execProcess = async (process, args) => {
  * 6. Writes the project name and initialize-directory to the VIP config file.
  */
 const setup = async (options) => {
-
     const { branch, repositoryUrl, redirectDomain, php_version, wp_version } = config;
     const { projectName } = options;
     const { currentDirectoryPath, applicationCodePath, vipConfigPath } = getApplicationInformation(options);
+    const github_token = process.env.GITHUB_TOKEN;
     try {
         const [error, isFileExist] = await checkFileExist(vipConfigPath);
         error && handleError(`You have already have project with this project name ${projectName}`, error);
         if (!isFileExist) {
             await createFolder(applicationCodePath);
-            const github_token = process.env.GITHUB_TOKEN;
             const git_url = `https://${github_token}@github.com/${repositoryUrl} -b ${branch} ${applicationCodePath} --depth 1`
             await execProcess('git', `clone ${git_url}`)
+            await execProcess('composer', `install --working-dir=${applicationCodePath}`)
             await execProcess('vip', `dev-env create  --elasticsearch=false --mailhog=false --media-redirect-domain=${redirectDomain} --mu-plugins=image --multisite=true --php=${php_version} --phpmyadmin=false --slug=${projectName} --title=${projectName} --wordpress=${wp_version} --xdebug=false --app-code=${applicationCodePath}`)
-            await execProcess('vip', `dev-env start --slug ${projectName}`)
             const myConfig = JSON.stringify({ "project_name": projectName, "initialize-directory": currentDirectoryPath }, null, 2);
+            await execProcess('vip', `dev-env start --slug ${projectName}`)
             await writeToFile(vipConfigPath, myConfig);
             alert({ type: 'success', msg: `${projectName} setup done successfully` });
+            // add message how to see the logs
+            // import data base
         }
     }
     catch (error) {
