@@ -59,7 +59,7 @@ const setup = async (options) => {
             const git_url = `https://${github_token}@github.com/${repositoryUrl} -b ${branch} ${applicationCodePath} --depth 1`
             await execProcess('git', `clone ${git_url}`)
             await execProcess('composer', `install --working-dir=${applicationCodePath}`)
-            await execProcess('vip', `dev-env create  --elasticsearch=false --mailhog=false --media-redirect-domain=${redirectDomain} --mu-plugins=image --multisite=true --php=${php_version} --phpmyadmin=false --slug=${projectName} --title=${projectName} --wordpress=${wp_version} --xdebug=false --app-code=${applicationCodePath}`)
+            await execProcess('vip', `dev-env create  --elasticsearch=false --mailpit=false --media-redirect-domain=${redirectDomain} --mu-plugins=image --multisite=true --php=${php_version} --phpmyadmin=false --slug=${projectName} --title=${projectName} --wordpress=${wp_version} --xdebug=false --app-code=${applicationCodePath}`)
             const myConfig = JSON.stringify({ "project_name": projectName, "initialize-directory": currentDirectoryPath }, null, 2);
             await execProcess('vip', `dev-env start --slug ${projectName}`)
             await writeToFile(vipConfigPath, myConfig);
