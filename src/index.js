@@ -148,7 +148,7 @@ const updateList = async (options, action, itemNameProperty = 'name', itemPathPr
             throw new Error(`Invalid action: ${action}`);
     }
     jsonData['mountedPluginList'] = list;
-    await writeToFile(vipConfigPath, JSON.stringify(jsonData));
+    await writeToFile(vipConfigPath, JSON.stringify(jsonData, null, 4));
     const yamlDump = await modifyDockerVolumes(list, yamlData);
     // await writeToFile(vipDockerFile, yamlDump);
     fs.writeFileSync(vipDockerFile, yamlDump, 'utf8');
