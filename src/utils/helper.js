@@ -1,10 +1,10 @@
-import {writeToFile} from '../fs/file.js';
-const createConfig = (input) => {
-    let myConfig = {"project-name": input};
-    writeToFile(`${process.cwd()}/newfile1.txt`, myConfig);
-    // console.log(`path: ${path}`);
-    // console.log(`input: ${input}`);
-    // console.log(`Here: ${process.cwd()}`);
+import chalk from 'chalk';
+const decorateList = (list) => {
+    let str = chalk.blue(`\n\nList of Plugins:\n\n`);
+    list.forEach((item, index) => {
+        str += `${chalk.yellow(index+1)} ${chalk.green.bold(item.name)} => ${chalk.blue.italic(item.path)}\n\n`;
+    });
+    return str;
 }
 
-export default createConfig;
+export default decorateList;

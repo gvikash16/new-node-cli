@@ -28,11 +28,6 @@ const meowFlags = {
   importMeta: import.meta,
   default: { projectName: 'en' },
   flags: {
-    preload: {
-      type: 'boolean',
-      shortFlag: 'p',
-      default: false
-    },
     branch: {
       type: 'boolean',
       shortFlag: 'b',
@@ -42,6 +37,11 @@ const meowFlags = {
       type: 'string',
       shortFlag: 'p',
       default: config.defaultProjectName,
+    },
+    addPath: {
+      type: 'string',
+      shortFlag: 'a',
+      required: true
     }
   
   }

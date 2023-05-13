@@ -1,5 +1,7 @@
+
 import { writeToFile, readFile, checkFileExist, createFolder } from './fs/file.js';
 import alert from './utils/alert.js';
+import decorateList from './utils/helper.js';
 import handleError from './utils/handleError.js';
 import config from './../config/index.js';
 import { basename } from 'path';
@@ -7,7 +9,6 @@ import { homedir } from 'os';
 import { execa } from 'execa'
 import yaml from 'js-yaml';
 import fs from 'fs';
-import chalk from 'chalk';
 /**
  * Returns an object containing information about the application.
  * @param {Object} options - The options object.
@@ -123,9 +124,14 @@ const updateList = async (options, action, itemNameProperty = 'name', itemPathPr
     let message = '';
     switch (action) {
         case 'add':
-            if (!hasItem) {
+            if(!hasItem && options.addPath !='') {
+                list.push({ [itemNameProperty]: basename(options.addPath), [itemPathProperty]: options.addPath });
+                message = 'added current directory';
+            }else if (!hasItem) { // for new path
                 list.push({ [itemNameProperty]: currentDirectoryName, [itemPathProperty]: currentDirectoryPath });
                 message = 'added current directory';
+            } else {
+                message = 'Path is already there';
             }
             break;
         case 'remove':
@@ -187,11 +193,7 @@ const listMountedPlugins = async (options) => {
   };
   
 const listAllMountedPlugins = async (list) => {
-    let str = chalk.blue(`\n\nList of Plugins:\n\n`);
-    list.forEach((item, index) => {
-        str += `${chalk.yellow(index+1)} ${chalk.green.bold(item.name)} => ${chalk.blue.italic(item.path)}\n\n`;
-    });
-    console.log(str);
+    console.log(decorateList(list));
   };
 
 /**
