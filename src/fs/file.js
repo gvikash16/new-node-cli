@@ -1,9 +1,13 @@
 import fs from 'fs';
-import alert from '../utils/alert.js';
 import { execa } from 'execa';
 
-
-
+/**
+ * Asynchronously reads the contents of a file.
+ * @async
+ * @function
+ * @param {string} filePath - The path of the file to read.
+ * @returns {Promise<[Error|null, string|null]>} A Promise that resolves with an array containing an Error object if an error occurred or null if the operation was successful, and the contents of the file as a string or null if an error occurred.
+ */
 const readFile = async (filePath) => {
   try {
     const data = await fs.promises.readFile(filePath, 'utf8');
@@ -13,6 +17,14 @@ const readFile = async (filePath) => {
   }
 }
 
+/**
+ * Asynchronously writes data to a file.
+ * @async
+ * @function
+ * @param {string} filePath - The path of the file to write to.
+ * @param {string} data - The data to write to the file.
+ * @returns {Promise<[Error|null]>} A Promise that resolves with an array containing an Error object if an error occurred or null if the operation was successful.
+ */
 const writeToFile = async (filePath, data) => {
   try {
     await fs.promises.writeFile(filePath, data);
@@ -22,6 +34,13 @@ const writeToFile = async (filePath, data) => {
   }
 }
 
+/**
+ * Asynchronously checks if a file exists.
+ * @async
+ * @function
+ * @param {string} filePath - The path of the file to check.
+ * @returns {Promise<[Error|null, boolean|null]>} A Promise that resolves with an array containing an Error object if an error occurred or null if the operation was successful, and a boolean indicating whether the file exists or null if an error occurred.
+ */
 const checkFileExist = async (filePath) => {
   try {
     await fs.promises.access(filePath);
@@ -35,6 +54,13 @@ const checkFileExist = async (filePath) => {
   }
 }
 
+/**
+ * Asynchronously deletes a file.
+ * @async
+ * @function
+ * @param {string} filePath - The path of the file to delete.
+ * @returns {Promise<[Error|null]>} A Promise that resolves with an array containing an Error object if an error occurred or null if the operation was successful.
+ */
 const deleteFile = async (filePath) => {
   try {
     await fs.promises.unlink(filePath);
@@ -44,45 +70,11 @@ const deleteFile = async (filePath) => {
   }
 }
 
-// const readFile = (filePath) => {
-//     try {
-//       let data = fs.readFileSync(filePath);
-//       let parsed_data = JSON.parse(data.toString());
-//       return parsed_data;
-//     } catch(e) {
-//       alert({type:'error', msg:e.message})
-//     }
-// }
-
-// const deleteFile = (filePath) => {
-//   if (fs.existsSync(filePath)) {
-//     fs.unlinkSync(filePath)
-//   }
-// }
-
-// function writeToFile(filePath, data) {
-//   try {
-//     fs.writeFileSync(filePath, JSON.stringify(data, null, 4));
-//   } catch(e) {
-//     alert({type:'error', msg:e.message})
-//   }
-// }
-
-// const checkFileExist = (filePath) => {
-//   return fs.existsSync(filePath);
-// }
-
-const checkFilePathExist = (filePath) => {
-
-}
-
-const copyFile = (filePath) => {
-
-}
 /**
- * Creates a new folder with the specified name.
- * @param {string} folderName - The name of the folder to create.
- * @returns {Promise<void>} A Promise that resolves when the folder has been created.
+ * Asynchronously creates a new folder with the specified name.
+ * @async
+ * @function
+ * @param {string} folderPath - The path of the folder to create.
  */
 async function createFolder(folderPath) {
   try {

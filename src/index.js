@@ -1,7 +1,5 @@
-
 import { writeToFile, readFile, checkFileExist, createFolder } from './fs/file.js';
 import alert from './utils/alert.js';
-import decorateList from './utils/helper.js';
 import handleError from './utils/handleError.js';
 import config from './../config/index.js';
 import { basename } from 'path';
@@ -9,6 +7,7 @@ import { homedir } from 'os';
 import { execa } from 'execa'
 import yaml from 'js-yaml';
 import fs from 'fs';
+import chalk from 'chalk';
 /**
  * Returns an object containing information about the application.
  * @param {Object} options - The options object.
@@ -60,6 +59,8 @@ const setup = async (options) => {
             const git_url = `https://${github_token}@github.com/${repositoryUrl} -b ${branch} ${applicationCodePath} --depth 1`
             await execProcess('git', `clone ${git_url}`)
             await execProcess('composer', `install --working-dir=${applicationCodePath}`)
+            const str = `vip dev-env create  --elasticsearch=false --mailpit=false --media-redirect-domain=${redirectDomain} --mu-plugins=image --multisite=true --php=${php_version} --phpmyadmin=false --slug=${projectName} --title=${projectName} --wordpress=${wp_version} --xdebug=false --app-code=${applicationCodePath}`;
+            console.log('str:', str);
             await execProcess('vip', `dev-env create  --elasticsearch=false --mailpit=false --media-redirect-domain=${redirectDomain} --mu-plugins=image --multisite=true --php=${php_version} --phpmyadmin=false --slug=${projectName} --title=${projectName} --wordpress=${wp_version} --xdebug=false --app-code=${applicationCodePath}`)
             const myConfig = JSON.stringify({ "project-name": projectName, "initialize-directory": currentDirectoryPath }, null, 4);
             await execProcess('vip', `dev-env start --slug ${projectName}`)
@@ -124,14 +125,9 @@ const updateList = async (options, action, itemNameProperty = 'name', itemPathPr
     let message = '';
     switch (action) {
         case 'add':
-            if(!hasItem && options.addPath !='') {
-                list.push({ [itemNameProperty]: basename(options.addPath), [itemPathProperty]: options.addPath });
-                message = 'added current directory';
-            }else if (!hasItem) { // for new path
+            if (!hasItem) {
                 list.push({ [itemNameProperty]: currentDirectoryName, [itemPathProperty]: currentDirectoryPath });
                 message = 'added current directory';
-            } else {
-                message = 'Path is already there';
             }
             break;
         case 'remove':
@@ -139,7 +135,7 @@ const updateList = async (options, action, itemNameProperty = 'name', itemPathPr
                 list = removeObjectByProperty(list, itemNameProperty, currentDirectoryName);
                 message = 'removed current directory';
             }
-            break;        
+            break;
         case "mountedPluginList":
             if (hasItem) {
                 message = "Listed all the mounted plugins above";
@@ -184,17 +180,29 @@ const removePlugin = async (options) => {
 const removeAllPlugin = async (options) => {
     updateList(options, 'clear');
 }
+
 /**
  * List all the mounted plugins from a JSON file.
  * @param {Object} option - The option object containing information about the plugin and file paths.
  */
 const listMountedPlugins = async (options) => {
     updateList(options, "mountedPluginList");
-  };
-  
+};
+
+/**
+ * Asynchronously lists all mounted plugins.
+ * @async
+ * @function
+ * @param {Object[]} list - An array of plugin objects.
+ * @param {string} list[].name - The name of the plugin.
+ * @param {string} list[].path - The path of the plugin.
+ */
 const listAllMountedPlugins = async (list) => {
-    console.log(decorateList(list));
-  };
+    const title = chalk.blue(`\n\nList of Plugins:\n\n`);
+    const pluginList = list.map((item, index) => `${chalk.yellow(index + 1)} ${chalk.green.bold(item.name)} => ${chalk.blue.italic(item.path)}\n\n`).join('');
+    console.log(title + pluginList);
+};
+
 
 /**
  * Displays the contents of a log file in real-time using the `tail` command.
@@ -202,8 +210,7 @@ const listAllMountedPlugins = async (list) => {
  */
 const logs = async (options) => {
     const { logsPath } = getApplicationInformation(options);
-    updatePluginList(options)
-    // await execProcess('tail', `-f ${logsPath}`)
+    await execProcess('tail', `-f ${logsPath}`)
 }
 
 const updatePluginList = (options) => {

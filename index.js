@@ -5,8 +5,7 @@ import {
     addPlugin,
     removePlugin,
     removeAllPlugin,
-    logs,
-    listMountedPlugins
+    logs
 } from './src/index.js';
 
 /**
@@ -67,17 +66,13 @@ async function handleCommand(command, options) {
             removeAllPlugin(options);
             break;
         case 'logs':
+        case 'l':
             logs(options);
             break;
         // case 'resetDB':
         //     reset(options);
         //     break;
-        case 'mountedPluginList':
-        case 'mpl':
-            listMountedPlugins(options);
-            break;
-        // path
-        // case 'folder': // 1 level deep
+        // case 'mountedPluginList':
         //     reset(options);
         //     break;
     

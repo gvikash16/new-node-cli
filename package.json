@@ -1,17 +1,17 @@
 {
-  "name": "vcli",
+  "name": "auth-dev",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "type": "module",
   "bin": {
-    "vcli": "./index.js"
+    "auth-dev": "./index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@automattic/vip": "^2.28.2",
+    "@automattic/vip": "2.28.3",
     "chalk": "^5.2.0",
     "execa": "^7.1.1",
     "js-yaml": "^4.1.0",
