@@ -1,5 +1,6 @@
 import { writeToFile, readFile, checkFileExist, createFolder } from './fs/file.js';
 import alert from './utils/alert.js';
+import formatPluginList from './utils/helper.js';
 import handleError from './utils/handleError.js';
 import config from './../config/index.js';
 import { basename } from 'path';
@@ -198,9 +199,7 @@ const listMountedPlugins = async (options) => {
  * @param {string} list[].path - The path of the plugin.
  */
 const listAllMountedPlugins = async (list) => {
-    const title = chalk.blue(`\n\nList of Plugins:\n\n`);
-    const pluginList = list.map((item, index) => `${chalk.yellow(index + 1)} ${chalk.green.bold(item.name)} => ${chalk.blue.italic(item.path)}\n\n`).join('');
-    console.log(title + pluginList);
+    console.log(formatPluginList(list));
 };
 
 

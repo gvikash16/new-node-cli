@@ -1,10 +1,18 @@
 import chalk from 'chalk';
-const decorateList = (list) => {
-    let str = chalk.blue(`\n\nList of Plugins:\n\n`);
-    list.forEach((item, index) => {
-        str += `${chalk.yellow(index+1)} ${chalk.green.bold(item.name)} => ${chalk.blue.italic(item.path)}\n\n`;
-    });
-    return str;
+
+/**
+ * Formats a list of plugins with colors and text styles.
+ * @param {Object[]} plugins - The list of plugins to format.
+ * @param {string} plugins[].name - The name of the plugin.
+ * @param {string} plugins[].path - The path of the plugin.
+ * @returns {string} The formatted list as a string.
+ */
+const formatPluginList = (plugins) => {
+  const title = chalk.blue(`\n\nList of Plugins:\n\n`);
+  const formattedPlugins = plugins.map((plugin, index) => (
+    `${chalk.yellow(index + 1)} ${chalk.green.bold(plugin.name)} => ${chalk.blue.italic(plugin.path)}\n\n`
+  )).join('');
+  return title + formattedPlugins;
 }
 
-export default decorateList;
+export default formatPluginList;
