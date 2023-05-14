@@ -1,11 +1,11 @@
 {
-  "name": "auth-dev",
+  "name": "vcli",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "type": "module",
   "bin": {
-    "auth-dev": "./index.js"
+    "vcli": "./index.js"
   },
   "keywords": [],
   "author": "",
