@@ -86,10 +86,25 @@ async function createFolder(folderPath) {
   }
 }
 
+/**
+ * Copies a directory and its contents to a new location using a shell command.
+ * @param {string} source - The path to the source directory.
+ * @param {string} destination - The path to the destination directory.
+ * @throws Will throw an error if the cp command fails.
+ */
+const copyDirectory = async (process, args) => {
+  try {
+    await execa(process, args.split(' '), { stdio: 'inherit' });
+  } catch (error) {
+    throw new Error(`Failed to copy folder: ${error.message}`);
+  }
+};
+
 export {
   readFile,
   deleteFile,
   writeToFile,
   checkFileExist,
-  createFolder
+  createFolder,
+  copyDirectory
 };

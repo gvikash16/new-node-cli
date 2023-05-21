@@ -1,4 +1,4 @@
-import { writeToFile, readFile, checkFileExist, createFolder } from './fs/file.js';
+import { writeToFile, readFile, checkFileExist, createFolder,copyDirectory } from './fs/file.js';
 import alert from './utils/alert.js';
 import formatPluginList from './utils/helper.js';
 import handleError from './utils/handleError.js';
@@ -9,6 +9,9 @@ import { execa } from 'execa'
 import yaml from 'js-yaml';
 import fs from 'fs';
 import chalk from 'chalk';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 /**
  * Returns an object containing information about the application.
  * @param {Object} options - The options object.
@@ -16,16 +19,19 @@ import chalk from 'chalk';
  * @returns {Object} An object containing information about the application.
  */
 function getApplicationInformation(options) {
-    const { vipDirectory, authConfigFileName, appDirectory, docker_file_name } = config;
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const { vipDirectory, authConfigFileName, appDirectory, docker_file_name, vip_config_path } = config;
+    const vipWpConfigPathSetting = path.join(__dirname, vip_config_path);
     const { projectName } = options;
     const currentDirectoryPath = process.cwd();
     const currentDirectoryName = basename(currentDirectoryPath);
     const applicationCodePath = `${homedir()}/${appDirectory}/${projectName}`;
     const vipDirectoryPath = `${homedir()}/${vipDirectory}/${projectName}/`
-    const vipConfigPath = `${homedir()}/${vipDirectory}/${projectName}/${authConfigFileName}`
+    const authConfigFile = `${homedir()}/${vipDirectory}/${projectName}/${authConfigFileName}`
     const logsPath = `${homedir()}/${vipDirectory}/${projectName}/log/debug.log`;
     const vipDockerFile = `${homedir()}/${vipDirectory}/${projectName}/${docker_file_name}`;
-    return { currentDirectoryName, currentDirectoryPath, applicationCodePath, vipDirectoryPath, vipConfigPath, logsPath, vipDockerFile };
+    return { currentDirectoryName, currentDirectoryPath, applicationCodePath, vipDirectoryPath, authConfigFile, logsPath, vipDockerFile, vipWpConfigPathSetting };
 }
 
 const execProcess = async (process, args) => {
@@ -50,22 +56,21 @@ const execProcess = async (process, args) => {
 const setup = async (options) => {
     const { branch, repositoryUrl, redirectDomain, php_version, wp_version } = config;
     const { projectName } = options;
-    const { currentDirectoryPath, applicationCodePath, vipConfigPath } = getApplicationInformation(options);
+    const { currentDirectoryPath, applicationCodePath, authConfigFile, vipWpConfigPathSetting } = getApplicationInformation(options);
     const github_token = process.env.GITHUB_TOKEN;
     try {
-        const [error, isFileExist] = await checkFileExist(vipConfigPath);
+        const [error, isFileExist] = await checkFileExist(authConfigFile);
         error && handleError(`You have already have project with this project name ${projectName}`, error);
         if (!isFileExist) {
             await createFolder(applicationCodePath);
             const git_url = `https://${github_token}@github.com/${repositoryUrl} -b ${branch} ${applicationCodePath} --depth 1`
             await execProcess('git', `clone ${git_url}`)
-            await execProcess('composer', `install --working-dir=${applicationCodePath}`)
-            const str = `vip dev-env create  --elasticsearch=false --mailpit=false --media-redirect-domain=${redirectDomain} --mu-plugins=image --multisite=true --php=${php_version} --phpmyadmin=false --slug=${projectName} --title=${projectName} --wordpress=${wp_version} --xdebug=false --app-code=${applicationCodePath}`;
-            console.log('str:', str);
+            // await copyDirectory('cp',`-R ${vipWpConfigPathSetting} ${applicationCodePath}`);
+            await execProcess('composer', `install --working-dir=${applicationCodePath}`);
             await execProcess('vip', `dev-env create  --elasticsearch=false --mailpit=false --media-redirect-domain=${redirectDomain} --mu-plugins=image --multisite=true --php=${php_version} --phpmyadmin=false --slug=${projectName} --title=${projectName} --wordpress=${wp_version} --xdebug=false --app-code=${applicationCodePath}`)
             const myConfig = JSON.stringify({ "project-name": projectName, "initialize-directory": currentDirectoryPath }, null, 4);
             await execProcess('vip', `dev-env start --slug ${projectName}`)
-            await writeToFile(vipConfigPath, myConfig);
+            await writeToFile(authConfigFile, myConfig);
             alert({ type: 'success', msg: `${projectName} setup done successfully` });
             // add message how to see the logs
             // import data base
@@ -115,8 +120,8 @@ const updateList = async (options, action, itemNameProperty = 'name', itemPathPr
     if (typeof action !== 'string') {
         throw new TypeError('The "action" parameter must be a string.');
     }
-    const { currentDirectoryName, currentDirectoryPath, vipConfigPath, vipDockerFile } = getApplicationInformation(options);
-    const [error, data] = await readFile(vipConfigPath);
+    const { currentDirectoryName, currentDirectoryPath, authConfigFile, vipDockerFile } = getApplicationInformation(options);
+    const [error, data] = await readFile(authConfigFile);
     // const [errorInDocker, yamlData] = await readFile(vipDockerFile);
     const yamlData = yaml.load(fs.readFileSync(vipDockerFile, 'utf8'));
 
@@ -151,7 +156,7 @@ const updateList = async (options, action, itemNameProperty = 'name', itemPathPr
             throw new Error(`Invalid action: ${action}`);
     }
     jsonData['mountedPluginList'] = list;
-    await writeToFile(vipConfigPath, JSON.stringify(jsonData, null, 4));
+    await writeToFile(authConfigFile, JSON.stringify(jsonData, null, 4));
     const yamlDump = await modifyDockerVolumes(list, yamlData);
     // await writeToFile(vipDockerFile, yamlDump);
     fs.writeFileSync(vipDockerFile, yamlDump, 'utf8');
